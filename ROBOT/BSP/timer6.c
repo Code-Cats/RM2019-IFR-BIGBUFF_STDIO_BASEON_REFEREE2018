@@ -39,6 +39,12 @@ void TIM6_Start(void)
     TIM_ITConfig(TIM6, TIM_IT_Update,ENABLE);
     TIM_ClearFlag(TIM6, TIM_FLAG_Update);	
 }
+
+__weak void Timer_1ms_CallBack(void)
+{
+	
+}
+
 /***************************************
 函数名：IM6_DAC_IRQHandler
 函数功能：执行系统响相应指令

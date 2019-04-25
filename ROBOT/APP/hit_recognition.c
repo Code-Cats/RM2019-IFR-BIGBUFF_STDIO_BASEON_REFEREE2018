@@ -17,7 +17,7 @@ description:
 ****************************************************/
 u8 CAN_GetTxMailboxesFreeLevel(CAN_TypeDef* CANx)
 {
-	uint8_t transmit_mailbox = 0;
+//	uint8_t transmit_mailbox = 0;
 	/* Check the parameters */
 	assert_param(IS_CAN_ALL_PERIPH(CANx));
 	/* Select one empty transmit mailbox */
@@ -286,6 +286,7 @@ u8 RefereeSetRedToBlueData[20]={0x5a, 0x04, 0x00, 0x04, 0x00, 0x01, 0x0b, 0x02 ,
 							0x00, 0x00, 0x2c, 0x53};
 void CAN_SetAllRed2Blue_SendMsg(void)
 {
+	delay_us(50);
 	CAN_SendNormalMsg(CAN1,0xfe,RefereeSetRedToBlueData,20);
 }
 
@@ -394,7 +395,7 @@ void Armor_Data_Analysis(AimorIDEnum id,u8* pdata,u8 length)	//仅适用于装甲板ID:
 u32 hit_count=0;
 void CAN1_Hit_Analysis(CanRxMsg *rx_message)
 {		
-	CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据
+	//CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据  后移至bsp层
 	
 	switch(rx_message->StdId)
 	{

@@ -78,7 +78,9 @@ void CAN1_RX0_IRQHandler(void)
 	if (CAN_GetITStatus(CAN1,CAN_IT_FMP0)!= RESET) 
 	{	   
 		CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
-		//CAN1_Feedback_Analysis(&rx_message);
+		
+		CAN_Receive(CAN1, CAN_FIFO0, &rx_message);
+		CAN1_Feedback_Analysis(&rx_message);
 		CAN1_Hit_Analysis(&rx_message);
 	}
 }

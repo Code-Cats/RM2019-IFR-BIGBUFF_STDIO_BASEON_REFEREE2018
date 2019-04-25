@@ -2,14 +2,9 @@
 #include "math.h"
 #include "hit_recognition.h"
 
-#define PITCH 0	//移到上面去了
-#define ROLL 1
-#define YAW 2
-
-
 extern u32 time_1ms_count;
-extern RobotHeatDataSimuTypeDef RobotHeatDataSimu42;
 
+u32 while_time_record=0;
 int main(void)
 {
 	SetWorkState(CHECK_STATE);
@@ -20,44 +15,39 @@ int main(void)
 	CAN_RefereeStart_SendMsg();
 	while(1)
 	 {
-		 //delay_ms(200);
 		 //delay_ms(1);
 		 ALLAutoTurnON();
-		 if(time_1ms_count%400==0)
+		 if(time_1ms_count-while_time_record>=400)
 		 {
 			 CAN_HeartBeat_SendMsg();
+			 while_time_record=time_1ms_count;
 		 }
 	 }
 }
 
-
+/****************************************************
+name:ArmorHit_CallBack
+function:装甲板被击打时产生的回调
+@param:id:装甲板ID最低字节
+@param:type:受打击的类型
+@return:void
+description:击打回调函数，其中处理击打数据
+****************************************************/
 void ArmorHit_CallBack(AimorIDEnum id,AimorHitTypeEnum type)
 {
  
 }
 
-
-//////////////////////////////////////////////////////////////////
-//??????,??printf??,??????use MicroLIB	  
-#if 1
-#pragma import(__use_no_semihosting)             
-//??????????                 
-struct __FILE 
-{ 
-	int handle; 
-}; 
-
-FILE __stdout;       
-//??_sys_exit()??????????    
-void _sys_exit(int x) 
-{ 
-	x = x; 
-} 
-//???fputc?? 
-int fputc(int ch, FILE *f)
-{ 	
-	while((USART1->SR&0X40)==0);//????,??????   
-	USART1->DR = (u8) ch;      
-	return ch;
+/****************************************************
+name:Timer_1ms_CallBack
+function:定时回调函数，每1ms调用一次
+@param:void
+@return:void
+description:在里面处理定时任务，注意处理任务时间不能大于1ms，不能使用Delay，否侧进错误中断
+****************************************************/
+void Timer_1ms_CallBack(void)
+{
+	//系统全局时间time_1ms_count 已做自加处理，无需再加
+	
 }
-#endif
+

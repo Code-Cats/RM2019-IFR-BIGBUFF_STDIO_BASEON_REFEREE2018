@@ -30,7 +30,7 @@ void Control_Task(void)	//2ms
 {
 	time_1ms_count++;
 	
-	LED_Blink_Set(2,3);
+	LED_Blink_Set(2,6);
 	
 	Check_Task();
 	
@@ -48,12 +48,18 @@ void Control_Task(void)	//2ms
 		LED_Blink_Run();
 	}
 	
+	if(time_1ms_count>5000&&time_1ms_count%2000==0)
+	{
+		CAN_HeartBeat_SendMsg();
+	}
+	
 	if(time_1ms_count>=20000)
 				 {
-					 if(time_1ms_count%20000==0)	//20s
+					 if(time_1ms_count%2000==0)	//20s
 					 {
 						 //CAN_SetALLBlueTurnOFF_SendMsg();
-						 x=1;CAN_SetAllRed2Blue_SendMsg();
+						 x=1;
+						 //CAN_SetAllRed2Blue_SendMsg();
 					 }
 //					 if((time_1ms_count+10000)%20000==0)
 //					 {
@@ -61,10 +67,10 @@ void Control_Task(void)	//2ms
 //						 x=2;
 //					 }
 				 }
-//	if(time_1ms_count%2==0)
-//	{
-//		Bigbuff_Task();
-//	}
+	if(time_1ms_count%2==0)
+	{
+		Bigbuff_Task();
+	}
 	
 	//Motor_Send();
 	

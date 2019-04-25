@@ -13,7 +13,7 @@ extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，
 *******************************************/
 void CAN1_Feedback_Analysis(CanRxMsg *rx_message)
 {		
-		CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据	
+		//CAN_Receive(CAN1, CAN_FIFO0, rx_message);//读取数据	
 		switch(rx_message->StdId)
 		{
 			case 0x201:	//右
