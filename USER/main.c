@@ -29,13 +29,15 @@ int main(void)
 name:ArmorHit_CallBack
 function:装甲板被击打时产生的回调
 @param:id:装甲板ID最低字节
-@param:type:受打击的类型
+@param:type:受打击的类型枚举：   HIT_OTHER,//撞击伤害
+								HIT_BULLET17,//17mm伤害
+								HIT_BULLET42,//42mm伤害
 @return:void
 description:击打回调函数，其中处理击打数据
 ****************************************************/
 void ArmorHit_CallBack(AimorIDEnum id,AimorHitTypeEnum type)
 {
- 
+	
 }
 
 /****************************************************

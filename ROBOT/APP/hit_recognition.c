@@ -379,7 +379,7 @@ void Armor_Data_Analysis(AimorIDEnum id,u8* pdata,u8 length)	//仅适用于装甲板ID:
 		if(*pdata==0x5a&&*(pdata+1)==0x09&&*(pdata+2)==0x00)	//伤害数据
 		{
 			AimorData[id].numOfhits++;
-			AimorData[id].hitcallback(id,HIT_OTHER);
+			AimorData[id].hitcallback(id,HIT_BULLET17);
 		}
 	}
 }
