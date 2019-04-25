@@ -11,7 +11,8 @@ void BSP_Init(void)
 {  
 	 NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 
    LED_Config();
-	 PWM_Config();
+	Plate_GPIO_Init();
+	 //PWM_Config();
 	 Laser_Config();
 	KEY_Config();
 //	 USART1_DMA_Config(100000);  

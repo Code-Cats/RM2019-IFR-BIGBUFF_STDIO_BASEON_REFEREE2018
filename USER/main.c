@@ -1,6 +1,7 @@
 #include "main.h"
 #include "math.h"
 #include "hit_recognition.h"
+#include "control_bigbuff.h"
 
 extern u32 time_1ms_count;
 
@@ -37,7 +38,25 @@ description:击打回调函数，其中处理击打数据
 ****************************************************/
 void ArmorHit_CallBack(AimorIDEnum id,AimorHitTypeEnum type)
 {
+	extern u8 viceboard_num;
+	extern u8 ready_flag;
+	extern u8 alreadly_count;
 	
+	if((id+1) == viceboard_num)
+	{
+		switch(viceboard_num)
+		{
+			case 1:PLATE1_LED2_ON; break;
+			case 2:PLATE2_LED2_ON; break;
+			case 3:PLATE3_LED2_ON; break;
+			case 4:PLATE4_LED2_ON; break;
+			default: break;
+		}
+		
+		alreadly_count++;
+		
+		ready_flag = 1;
+	}
 }
 
 /****************************************************
@@ -50,6 +69,6 @@ description:在里面处理定时任务，注意处理任务时间不能大于1ms，不能使用Delay，否侧
 void Timer_1ms_CallBack(void)
 {
 	//系统全局时间time_1ms_count 已做自加处理，无需再加
-	
+	BigBuff_Control_Tack();
 }
 

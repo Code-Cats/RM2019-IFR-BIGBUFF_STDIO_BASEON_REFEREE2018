@@ -19,3 +19,9 @@
 说明：初始化函数调用请添加在BSP.C的BSP_Init()中。初始化GPIO函数请写上对应功能名，并放在gpio.c中
 
 请勿修改 hit_recognition.c/.h 以及 bigbuff_6623.c/.h中的内容！！！
+
+			（装甲板）						（装甲板下面的架子）
+TIM3 CH1  --	ID0  			TIM2 CH1  --	ID0  
+TIM3 CH2  --	ID1  			TIM2 CH2  --	ID1  
+TIM3 CH3  --	ID2  			TIM2 CH3  --	ID2  
+TIM3 CH4  --	ID3  			TIM2 CH4  --	ID3  

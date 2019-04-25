@@ -1,4 +1,5 @@
 #include "gpio.h"
+#include "control_bigbuff.h"
 
 /*************************
 º¯ÊýÃû£ºKEY_Configuration
@@ -61,5 +62,29 @@ void Laser_Config(void)
 	 gpio.GPIO_Speed = GPIO_Speed_100MHz;
 	 GPIO_Init(GPIOC, &gpio);
 	 GPIO_ResetBits(GPIOC, GPIO_Pin_5);
+}
+
+void Plate_GPIO_Init(void)
+{
+	GPIO_InitTypeDef gpio;
+	
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	
+	gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_6 | GPIO_Pin_7;
+	gpio.GPIO_Mode = GPIO_Mode_OUT;
+	gpio.GPIO_OType = GPIO_OType_PP;
+	gpio.GPIO_Speed = GPIO_Speed_100MHz;
+	
+	GPIO_Init(GPIOA, &gpio);
+	
+	gpio.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
+	GPIO_Init(GPIOB, &gpio);
+	
+	gpio.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+	GPIO_Init(GPIOC, &gpio);
+	
+	PLATE_LED_ALL_OFF;
 }
 
