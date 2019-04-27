@@ -78,8 +78,13 @@ void CAN_SendNormalMsg(CAN_TypeDef* CANx, uint32_t StdId, u8* pdata, u8 length)
 		{
 			TxMessage.Data[i]=pdata[i+Txcount];
 		}
-		
-		while(CAN_GetTxMailboxesFreeLevel(CANx)==0);
+		u32 count_overtime=0;
+		while(CAN_GetTxMailboxesFreeLevel(CANx)==0)
+		{
+			count_overtime++;
+			if(count_overtime>10000)
+				break;
+		}
 		CAN_Transmit(CANx,&TxMessage);
 		
 		Txcount+=TxMessage.DLC;
