@@ -59,6 +59,7 @@ void TIM6_DAC_IRQHandler(void)
 		TIM_ClearITPendingBit(TIM6,TIM_IT_Update);
     TIM_ClearFlag(TIM6, TIM_FLAG_Update);
 		Control_Task();
+		Timer_1ms_CallBack();
    }
 }
 
