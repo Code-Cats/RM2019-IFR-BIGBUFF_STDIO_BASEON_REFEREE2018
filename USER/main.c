@@ -16,6 +16,7 @@ int main(void)
 	CAN_RefereeStart_SendMsg();
 	while(1)
 	 {
+		 //PLATE_LED_ALL_ON;
 		 //delay_ms(1);
 		 ALLAutoTurnON();
 		 if(time_1ms_count-while_time_record>=400)
@@ -69,6 +70,6 @@ description:在里面处理定时任务，注意处理任务时间不能大于1ms，不能使用Delay，否侧
 void Timer_1ms_CallBack(void)
 {
 	//系统全局时间time_1ms_count 已做自加处理，无需再加
-	BigBuff_Control_Tack();
+	//BigBuff_Control_Tack();
 }
 

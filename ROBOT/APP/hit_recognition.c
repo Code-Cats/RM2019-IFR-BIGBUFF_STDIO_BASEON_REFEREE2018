@@ -239,6 +239,20 @@ void CAN_SetID3TurnON_SendMsg(void)	//开机可亮 关灯后不可亮
 	CAN_SendNormalMsg(CAN1,0x143,RefereeID3SetTurnONData,16);
 }
 
+/****************************************************
+name:CAN_SetID4TurnON_SendMsg
+function:发送裁判亮灯数据
+@param:void
+@return:void
+description:将数据存入TxMessage结构体再由CAN_Transmit发送
+****************************************************/
+u8 RefereeID4SetTurnONData[16]={0x5a, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02 ,\
+							0x04, 0x01, 0x00, 0x07, 0x15, 0x0d, 0x6b, 0xb7 };//0xe8
+void CAN_SetID4TurnON_SendMsg(void)	//开机可亮 关灯后不可亮
+{
+	CAN_SendNormalMsg(CAN1,0x144,RefereeID3SetTurnONData,16);
+}
+
 
 void CAN_SetIDxTurnON_Task(AimorIDEnum id)
 {
@@ -266,6 +280,7 @@ void CAN_SetIDxTurnON_Task(AimorIDEnum id)
 		}
 		case AIMORID_244:
 		{
+			CAN_SetID4TurnON_SendMsg();
 			break;
 		}
 		default:

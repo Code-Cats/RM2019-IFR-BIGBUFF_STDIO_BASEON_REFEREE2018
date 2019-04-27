@@ -3,6 +3,7 @@
 #include "gpio.h"
 
 extern YUN_MOTOR_DATA	yunMotorData;	//云台挂载在CAN1上，因为CAN2预留了6pin接口，云台不需要该接口，为不浪费，故接CAN1
+extern Error_check_t Error_Check;
 
 PID_GENERAL          PID_BIGBUFF_SPEED=PID_BIGBUFF_SPEED_DEFAULT;
 
@@ -47,6 +48,11 @@ void Bigbuff_Task(void)
 	else
 	{
 		bigbuff_roaite_count=0;
+	}
+	
+	if(Error_Check.statu[LOST_YAW]==1)
+	{
+		return;	//没有电机就不进行解算
 	}
 	
 	yunMotorData.yaw_tarV=bigbuff_roaite*30;

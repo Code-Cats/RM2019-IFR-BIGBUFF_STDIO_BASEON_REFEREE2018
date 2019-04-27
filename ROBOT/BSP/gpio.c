@@ -82,7 +82,7 @@ void Plate_GPIO_Init(void)
 	gpio.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
 	GPIO_Init(GPIOB, &gpio);
 	
-	gpio.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9;
+	gpio.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_8 | GPIO_Pin_9;
 	GPIO_Init(GPIOC, &gpio);
 	
 	PLATE_LED_ALL_OFF;

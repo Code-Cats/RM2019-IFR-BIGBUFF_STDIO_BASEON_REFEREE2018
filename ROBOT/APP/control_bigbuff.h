@@ -27,9 +27,10 @@
 #define PLATE4_LED2_ON											digitalHi(GPIOB, GPIO_Pin_11)
 #define PLATE4_LED2_OFF											digitalLo(GPIOB, GPIO_Pin_11)
 
-#define PLATE_LED_ALL_OFF										digitalLo(GPIOA, GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_6|GPIO_Pin_7);digitalLo(GPIOB, GPIO_Pin_10|GPIO_Pin_11);digitalLo(GPIOC, GPIO_Pin_8|GPIO_Pin_9)
+#define PLATE_LED_ALL_OFF										digitalLo(GPIOA, GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_6|GPIO_Pin_7);digitalLo(GPIOB, GPIO_Pin_10|GPIO_Pin_11);digitalLo(GPIOC, GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_8|GPIO_Pin_9)
 #define PLATE_LED_ALL_ON										digitalHi(GPIOA, GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_6|GPIO_Pin_7);digitalHi(GPIOB, GPIO_Pin_10|GPIO_Pin_11);digitalHi(GPIOC, GPIO_Pin_8|GPIO_Pin_9)
 #define PLATE_LED_ALL_TOGGLE									digitalToggle(GPIOA, GPIO_Pin_0)
+
 
 void BigBuff_Control_Tack(void);
 
