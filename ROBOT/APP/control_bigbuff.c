@@ -1,7 +1,5 @@
 #include "control_bigbuff.h"
 #include "time.h"
-//#include "time.h"
-
 
 u8 viceboard_num = 0;
 
@@ -135,7 +133,7 @@ const u8 viceboard_seqience[120][5]={
 u8 alreadly_count = 0;
 u8 plate_sequence = 0;
 u8 ready_flag = 1;
-
+u8 last_number = 0;
 void Work_Normal(void)
 {
 	extern u32 time_1ms_count;
@@ -150,6 +148,11 @@ void Work_Normal(void)
 			if(select_viceboard_flag)
 			{
 				plate_sequence = rand()%120;//time_1ms_count % 120;
+				while(last_number == viceboard_seqience[plate_sequence][0])
+				{
+					plate_sequence = rand()%120;
+				}
+				last_number = viceboard_seqience[plate_sequence][0];
 				select_viceboard_flag = 0;
 
 			}
