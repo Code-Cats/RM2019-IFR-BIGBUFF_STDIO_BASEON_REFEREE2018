@@ -1,6 +1,8 @@
-#ifndef __GPIOCTRL_H__
-#define __GPIOCTRL_H__
-#include "main.h"
+#ifndef __LED_CONTROL_H__
+#define __LED_CONTROL_H__
+
+#include "sys.h"
+
 
 #define GREEN_LED_ON()      GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 #define GREEN_LED_OFF()     GPIO_SetBits(GPIOC, GPIO_Pin_1)
@@ -20,5 +22,8 @@
 void LED_Blink_Run(void);
 void LED_Blink_Set(u8 frequency_green,u8 frequency_red);	//2s内闪烁次数//LED闪烁运行函数10h处理频率
 
+void SK6812_Run(void);
+void SK6812_SetStart(void);	//调用周期100ms
+void SK6812_SetNormal(void);
+void SK6812_SetError(void);
 #endif
-

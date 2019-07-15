@@ -15,8 +15,6 @@ WorkState_e workState=PREPARE_STATE;
 //extern RC_Ctl_t RC_Ctl;
 
 extern YUN_MOTOR_DATA 	yunMotorData;
-extern CHASSIS_DATA chassis_Data;
-
 
 //extern s16 Chassis_Vx;
 //extern s16 Chassis_Vy;
@@ -31,6 +29,11 @@ void Control_Task(void)	//2ms
 	time_1ms_count++;
 	
 	LED_Blink_Set(2,6);
+	
+	if(time_1ms_count%100==0&&time_1ms_count>2000)
+	{
+		SK6812_Run();	//全彩RGB运行函数
+	}
 	
 	Check_Task();
 	
