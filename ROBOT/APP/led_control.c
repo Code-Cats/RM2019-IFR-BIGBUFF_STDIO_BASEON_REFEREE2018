@@ -90,10 +90,11 @@ void SK6812_Run(void)
 	SK6812_BIGBUFF_Set();
 	//led_lightnums++;
 	//if(led_lightnums>1000) led_lightnums=0;
-	PAGE1_UpdateColor(SK6812Colors,50);
-	PAGE2_UpdateColor(SK6812Colors,3);
-	PAGE3_UpdateColor(SK6812Colors,3);
-	//PAGE4_UpdateColor(SK6812Colors,led_lightnums);
+	PAGE1_UpdateColor(SK6812Colors,1);//OK
+	PAGE2_UpdateColor(SK6812Colors,2);//XX
+	PAGE3_UpdateColor(SK6812Colors,3);//OK
+	PAGE4_UpdateColor(SK6812Colors,4);	//OK”“…œ
+	PAGE5_UpdateColor(SK6812Colors,5);
 	//PWM2_1_DMA_Enable();
 	
 }

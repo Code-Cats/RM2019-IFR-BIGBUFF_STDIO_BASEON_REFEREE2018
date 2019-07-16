@@ -13,9 +13,12 @@ void BSP_Init(void)
    LED_Config();
 	//Plate_GPIO_Init();
 	 //PWM_Config();
-	Sk6812_Init();
+	
 	 Laser_Config();
 	KEY_Config();
+	
+	Sk6812_Init();
+	
 //	 USART1_DMA_Config(100000);  
 //   USART6_ViceBoard_Init(115200);
 //	 USART3_Configuration(115200);
