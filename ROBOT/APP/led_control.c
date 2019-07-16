@@ -90,8 +90,10 @@ void SK6812_Run(void)
 	SK6812_BIGBUFF_Set();
 	//led_lightnums++;
 	//if(led_lightnums>1000) led_lightnums=0;
-	PAGE1_UpdateColor(SK6812Colors,led_lightnums);
-	PAGE2_UpdateColor(SK6812Colors,led_lightnums);
+	PAGE1_UpdateColor(SK6812Colors,50);
+	PAGE2_UpdateColor(SK6812Colors,3);
+	PAGE3_UpdateColor(SK6812Colors,3);
+	//PAGE4_UpdateColor(SK6812Colors,led_lightnums);
 	//PWM2_1_DMA_Enable();
 	
 }
@@ -380,7 +382,7 @@ void SK6812_SetError(void)
 #define BIGBUFF_CYAN_R 0x00
 #define BIGBUFF_CYAN_G 0x60
 #define BIGBUFF_CYAN_B 0x43
-u8 BIGBUFF_COLOR=ORANGE;
+u8 BIGBUFF_COLOR=CYAN;
 void SK6812_BIGBUFF_Set(void)
 {
 	
@@ -410,9 +412,12 @@ void SK6812_BIGBUFF_Set(void)
 			}
 			else
 			{
-				SK6812Colors[i][SK6812_GREEN]=0;
-				SK6812Colors[i][SK6812_BLUE]=0;
-				SK6812Colors[i][SK6812_RED]=0;
+//				SK6812Colors[i][SK6812_GREEN]=0;
+//				SK6812Colors[i][SK6812_BLUE]=0;
+//				SK6812Colors[i][SK6812_RED]=0;
+				SK6812Colors[i][SK6812_GREEN]=BIGBUFF_CYAN_G;
+				SK6812Colors[i][SK6812_BLUE]=BIGBUFF_CYAN_B;
+				SK6812Colors[i][SK6812_RED]=BIGBUFF_CYAN_R;
 			}
 			
 		}

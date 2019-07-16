@@ -12,6 +12,8 @@ void Sk6812_Init(void)
 	PWM2_Init();
 	PWM2_1_DMA_Init();
 	PWM2_2_DMA_Init();
+	PWM2_3_DMA_Init();
+	//PWM2_4_DMA_Init();
 	TIM_Cmd(TIM2, ENABLE);  /* 使能TIM2 */
 }
 
@@ -71,7 +73,7 @@ void PWM2_Init(void)
 	TIM_Cmd(TIM2,DISABLE);
 }
 
-u32 Pwm2_1_DMABuffer[SK6812_SIZE]={0};
+u16 Pwm2_1_DMABuffer[SK6812_SIZE]={0};
 void PWM2_1_DMA_Init(void)
 {
 	NVIC_InitTypeDef nvic;
@@ -89,8 +91,8 @@ void PWM2_1_DMA_Init(void)
     dma.DMA_BufferSize = SK6812_SIZE;/* DMA通道的DMA缓存的大小 */
     dma.DMA_PeripheralInc = DMA_PeripheralInc_Disable;/* 外设地址寄存器不变 */
     dma.DMA_MemoryInc = DMA_MemoryInc_Enable;/* 内存地址寄存器递增 */
-    dma.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;/* 数据宽度为32位 */
-    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;/* 数据宽度为32位 */
+    dma.DMA_PeripheralDataSize = DMA_MemoryDataSize_HalfWord;/* 数据宽度为32位 */
+    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;/* 数据宽度为32位 */
     dma.DMA_Mode = DMA_Mode_Normal;      ///* 工作在正常模式 */工作在正常缓存模式
     dma.DMA_Priority = DMA_Priority_Medium;   //DMA通道 x拥有中优先级 
     dma.DMA_FIFOMode = DMA_FIFOMode_Disable;   //DMA通道x没有设置为内存到内存传输
@@ -153,6 +155,88 @@ void PWM2_2_DMA_Init(void)
 	////TIM_Cmd(TIM2, ENABLE);  /* 使能TIM5 */	//4个通道最后只能使能一次
 }
 
+u32 Pwm2_3_DMABuffer[SK6812_SIZE]={0};
+void PWM2_3_DMA_Init(void)
+{
+	NVIC_InitTypeDef nvic;
+    DMA_InitTypeDef dma;
+    
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);   //使能DMA传输
+    delay_ms(1);
+
+	DMA_Cmd(DMA1_Stream1, DISABLE);
+	DMA_DeInit(DMA1_Stream1);
+    dma.DMA_Channel = DMA_Channel_3;
+    dma.DMA_PeripheralBaseAddr = (uint32_t)(&TIM2->CCR3);  /* DMA外设基地址 *///DMA外设TIM2-CCR3地址/
+    dma.DMA_Memory0BaseAddr = (uint32_t)Pwm2_3_DMABuffer; ///* DMA内存基地址 */DMA内存基地址/
+    dma.DMA_DIR = DMA_DIR_MemoryToPeripheral;/* 数据传输方向，从内存读取发送到外设 */
+    dma.DMA_BufferSize = SK6812_SIZE;/* DMA通道的DMA缓存的大小 */
+    dma.DMA_PeripheralInc = DMA_PeripheralInc_Disable;/* 外设地址寄存器不变 */
+    dma.DMA_MemoryInc = DMA_MemoryInc_Enable;/* 内存地址寄存器递增 */
+    dma.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;/* 数据宽度为32位 */
+    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;/* 数据宽度为32位 */
+    dma.DMA_Mode = DMA_Mode_Normal;      ///* 工作在正常模式 */工作在正常缓存模式
+    dma.DMA_Priority = DMA_Priority_Medium;   //DMA通道 x拥有中优先级 
+    dma.DMA_FIFOMode = DMA_FIFOMode_Disable;   //DMA通道x没有设置为内存到内存传输
+    dma.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;//DMA_FIFOThreshold_HalfFull;//DMA_FIFOThreshold_1QuarterFull;
+    dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+    dma.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+		
+	    /* 配置DMA */
+    DMA_Init(DMA1_Stream1, &dma);
+
+    /*使能TIM的DMA接口 */
+	//TIM_SelectCCDMA(TIM5,ENABLE);
+	//TIM_DMAConfig(TIM5, TIM_DMABase_CCR3, TIM_DMABurstLength_16Bytes);
+	
+    //TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE);	/* 如果是要调节占空比就把这行去掉注释，注释另一行，再修改相应通道 */
+	TIM_DMACmd(TIM2, TIM_DMA_CC3, ENABLE);	/* 如果是要调节频率就把这行去掉注释，注释另一行，再修改相应通道 */
+
+    DMA_Cmd(DMA1_Stream1, DISABLE);	 /*不使能DMA */  
+	////TIM_Cmd(TIM2, ENABLE);  /* 使能TIM5 */	//4个通道最后只能使能一次
+}
+
+////u32 Pwm2_4_DMABuffer[SK6812_SIZE]={0};
+////void PWM2_4_DMA_Init(void)
+////{
+////	NVIC_InitTypeDef nvic;
+////    DMA_InitTypeDef dma;
+////    
+////    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);   //使能DMA传输
+////    delay_ms(1);
+
+////	DMA_Cmd(DMA1_Stream7, DISABLE);
+////	DMA_DeInit(DMA1_Stream7);
+////    dma.DMA_Channel = DMA_Channel_3;
+////    dma.DMA_PeripheralBaseAddr = (uint32_t)(&TIM2->CCR4);  /* DMA外设基地址 *///DMA外设TIM5-CCR3地址/
+////    dma.DMA_Memory0BaseAddr = (uint32_t)Pwm2_4_DMABuffer; ///* DMA内存基地址 */DMA内存基地址/
+////    dma.DMA_DIR = DMA_DIR_MemoryToPeripheral;/* 数据传输方向，从内存读取发送到外设 */
+////    dma.DMA_BufferSize = SK6812_SIZE;/* DMA通道的DMA缓存的大小 */
+////    dma.DMA_PeripheralInc = DMA_PeripheralInc_Disable;/* 外设地址寄存器不变 */
+////    dma.DMA_MemoryInc = DMA_MemoryInc_Enable;/* 内存地址寄存器递增 */
+////    dma.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;/* 数据宽度为32位 */
+////    dma.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;/* 数据宽度为32位 */
+////    dma.DMA_Mode = DMA_Mode_Normal;      ///* 工作在正常模式 */工作在正常缓存模式
+////    dma.DMA_Priority = DMA_Priority_Medium;   //DMA通道 x拥有中优先级 
+////    dma.DMA_FIFOMode = DMA_FIFOMode_Disable;   //DMA通道x没有设置为内存到内存传输
+////    dma.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;//DMA_FIFOThreshold_HalfFull;//DMA_FIFOThreshold_1QuarterFull;
+////    dma.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+////    dma.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+////		
+////	    /* 配置DMA */
+////    DMA_Init(DMA1_Stream7, &dma);
+
+////    /*使能TIM的DMA接口 */
+////	//TIM_SelectCCDMA(TIM5,ENABLE);
+////	//TIM_DMAConfig(TIM5, TIM_DMABase_CCR3, TIM_DMABurstLength_16Bytes);
+////	
+////    //TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE);	/* 如果是要调节占空比就把这行去掉注释，注释另一行，再修改相应通道 */
+////	TIM_DMACmd(TIM2, TIM_DMA_CC4, ENABLE);	/* 如果是要调节频率就把这行去掉注释，注释另一行，再修改相应通道 */
+
+////    DMA_Cmd(DMA1_Stream7, DISABLE);	 /*不使能DMA */  
+////	////TIM_Cmd(TIM2, ENABLE);  /* 使能TIM5 */	//4个通道最后只能使能一次
+////}
+
 
 
 u32 Pwm2_1_Dmasetcounter=0;
@@ -199,6 +283,49 @@ bool PWM2_2_DMA_Enable(void)	//DMA1_S6C3
 	}
 }
 
+u32 Pwm2_3_Dmasetcounter=0;
+bool PWM2_3_DMA_Enable(void)	//DMA1_S6C3
+{
+	static u8 start_flag=0;	//否则第一次无法启动
+	if(DMA_GetFlagStatus(DMA1_Stream1,DMA_FLAG_TCIF1)!= RESET || start_flag!=1)	//传输完成标志，若在传输过程中再次设置将会打乱时序
+	{
+		start_flag=1;
+		DMA_ClearFlag(DMA1_Stream1,DMA_IT_TCIF1);
+		DMA_Cmd(DMA1_Stream1, DISABLE );
+		DMA_SetCurrDataCounter(DMA1_Stream1,Pwm2_3_Dmasetcounter);	//SK6812_SIZE
+
+		DMA_Cmd(DMA1_Stream1, ENABLE);
+		//TIM_Cmd(TIM5, ENABLE);  /* 使能TIM3 */
+		TIM2->EGR |= 0x00000001;	/* 由于最后一次ARR值为0，这是为了停止定时器对io口的操作，但是不要忽略了一点：CNT并没有停止计数，而且是不会再停下来，如果没有手动操作的话，所以需要在每次dma使能时加上一句，将EGR里的UG位置1，清零计数器 */
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+////u32 Pwm2_4_Dmasetcounter=0;
+////bool PWM2_4_DMA_Enable(void)	//DMA1_S6C3
+////{
+////	static u8 start_flag=0;	//否则第一次无法启动
+////	if(DMA_GetFlagStatus(DMA1_Stream7,DMA_FLAG_TCIF7)!= RESET || start_flag!=1)	//传输完成标志，若在传输过程中再次设置将会打乱时序
+////	{
+////		start_flag=1;
+////		DMA_ClearFlag(DMA1_Stream7,DMA_IT_TCIF7);
+////		DMA_Cmd(DMA1_Stream7, DISABLE );
+////		DMA_SetCurrDataCounter(DMA1_Stream7,Pwm2_4_Dmasetcounter);	//SK6812_SIZE
+
+////		DMA_Cmd(DMA1_Stream7, ENABLE);
+////		//TIM_Cmd(TIM5, ENABLE);  /* 使能TIM3 */
+////		TIM2->EGR |= 0x00000001;	/* 由于最后一次ARR值为0，这是为了停止定时器对io口的操作，但是不要忽略了一点：CNT并没有停止计数，而且是不会再停下来，如果没有手动操作的话，所以需要在每次dma使能时加上一句，将EGR里的UG位置1，清零计数器 */
+////		return true;
+////	}
+////	else
+////	{
+////		return false;
+////	}
+////}
 
 bool PAGE1_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发	//PWM2_1
 {
@@ -238,6 +365,43 @@ bool PAGE2_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_2
 	return true;
 }
 
+bool PAGE3_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_3
+{
+	if(led_nums>SK6812_NUMS)	return false;
+	for(int i=0;i<led_nums;i++)
+	{
+		for(int channel=SK6812_GREEN;channel<SK6812_BLUE+1;channel++)	//这两个for可合并为一个
+		{
+			for(int bit=7;bit>=0;bit--)
+			{
+				Pwm2_3_DMABuffer[i*24+channel*8+(7-bit)]=SK6812BitDef[*(colors[i] + channel)>>bit&0x01];
+			}
+		}
+	}
+	Pwm2_3_DMABuffer[led_nums*24]=0;
+	Pwm2_3_Dmasetcounter=led_nums*24+1;
+	PWM2_3_DMA_Enable();
+	return true;
+}
+
+////bool PAGE4_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_3
+////{
+////	if(led_nums>SK6812_NUMS)	return false;
+////	for(int i=0;i<led_nums;i++)
+////	{
+////		for(int channel=SK6812_GREEN;channel<SK6812_BLUE+1;channel++)	//这两个for可合并为一个
+////		{
+////			for(int bit=7;bit>=0;bit--)
+////			{
+////				Pwm2_4_DMABuffer[i*24+channel*8+(7-bit)]=SK6812BitDef[*(colors[i] + channel)>>bit&0x01];
+////			}
+////		}
+////	}
+////	Pwm2_4_DMABuffer[led_nums*24]=0;
+////	Pwm2_4_Dmasetcounter=led_nums*24+1;
+////	PWM2_4_DMA_Enable();
+////	return true;
+////}
 
 //////void SK6812_TIM5_3_DMA_Init(void)
 //////{
