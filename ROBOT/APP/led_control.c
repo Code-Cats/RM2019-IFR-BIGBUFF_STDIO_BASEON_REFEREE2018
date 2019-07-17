@@ -89,9 +89,14 @@ void SK6812_Run(void)	//200hz
 	
 	//led_lightnums++;
 	//if(led_lightnums>1000) led_lightnums=0;
-	
+	static u16 light_state=1;
 	if(time_1ms_count%100==0)
 	{
+		light_state<<=1;
+		if(light_state==(0x0001<<10))
+		{
+			light_state=1;
+		}
 		//SK6812_BIGBUFF_Set();
 	
 		//PAGE1_UpdateColor(SK6812Colors,1);//OK
@@ -107,48 +112,118 @@ void SK6812_Run(void)	//200hz
 		//PWM2_3_DMA_Enable();
 	}
 	
+	static u8 segcolor_r[4][3]=\
+		{\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+			{0,0,0},\
+			{0,0,0},\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+		};
+	static u8 segcolor_l[4][3]=\
+		{\
+			{0,0,0},\
+			{0,0,0},\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+		};
+	static u8 segcolor_no[4][3]=\
+		{\
+			{0,0,0},\
+			{0,0,0},\
+			{0,0,0},\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+		};
+	
 	if((time_1ms_count-15)%100==0)
 	{
-		PAGE1_UpdateColor(SK6812Colors,1);//OK
+		static u16 segnode[4]={0,PAGE1_ARMORSTART,PAGE1_ARMOREND,PAGE1_ALLEND};
+		if((light_state&0x0001<<0)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+		}
+		else if((light_state&0x0001<<1)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+		}
+		else
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+		}
+		PAGE1_UpdateColor(SK6812Colors,290);//OK
 		PWM3_1_DMA_Enable();
 	}
 	else if((time_1ms_count-30)%100==0)
 	{
 		//PAGE2_UpdateColor(SK6812Colors,2);//XX
-		static u16 segnode[4]={72,72*2,72*3,287};
-		static u8 segcolor[4][3]=\
-		{\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-			{0,0,0},\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-			{0,0,0},\
-		};
-		SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor,4,0,10);
+		static u16 segnode[4]={0,PAGE2_ARMORSTART,PAGE2_ARMOREND,PAGE2_ALLEND};
+		if((light_state&0x0001<<2)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+		}
+		else if((light_state&0x0001<<3)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+		}
+		else
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+		}
+		
 		PAGE2_UpdateColor(SK6812Colors,287);
 		PWM3_2_DMA_Enable();
-		
-		for(int i=0;i<5;i++)
-		{
-			segnode[i]++;
-			if(segnode[i]>287)
-			{
-				segnode[i]=0;
-			}
-		}
 	}
 	else if((time_1ms_count-45)%100==0)
 	{
-		PAGE3_UpdateColor(SK6812Colors,3);//OK
+		static u16 segnode[4]={0,PAGE3_ARMORSTART,PAGE3_ARMOREND,PAGE3_ALLEND};
+		if((light_state&0x0001<<4)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+		}
+		else if((light_state&0x0001<<5)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+		}
+		else
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+		}
+		PAGE3_UpdateColor(SK6812Colors,350);//OK
 		PWM3_3_DMA_Enable();
 	}
 	else if((time_1ms_count-60)%100==0)
 	{
-		PAGE4_UpdateColor(SK6812Colors,4);	//
+		static u16 segnode[4]={0,PAGE4_ARMORSTART,PAGE4_ARMOREND,PAGE4_ALLEND};
+		if((light_state&0x0001<<6)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+		}
+		else if((light_state&0x0001<<7)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+		}
+		else
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+		}
+		PAGE4_UpdateColor(SK6812Colors,290);	//
 		PWM2_2_DMA_Enable();
 	}
 	else if((time_1ms_count-75)%100==0)
 	{
-		PAGE5_UpdateColor(SK6812Colors,5);
+		static u16 segnode[4]={0,PAGE5_ARMORSTART,PAGE5_ARMOREND,PAGE5_ALLEND};
+		if((light_state&0x0001<<8)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+		}
+		else if((light_state&0x0001<<9)!=0)
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+		}
+		else
+		{
+			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+		}
+		PAGE5_UpdateColor(SK6812Colors,290);
 		PWM2_3_DMA_Enable();
 	}
 
@@ -546,7 +621,139 @@ void SK6812_Draw_ColorSegmentation(u8 allcolors[][3],u16 seg_node[],u8 seg_color
 		
 	}
 	
-	
+	if(smooth_flag==true)	//平滑使能
+	{
+		int i=0;
+		i=seg_node[0];
+		u16 seg_end=seg_node[0]>0?seg_node[0]-1:289;
+		while(i!=seg_end)	//向前包含关系 即当前节点为上一段颜色内
+		{	//若采用while循环则无法得知当前i属于seg_node第几段，则采用对比前后位value的方法，当坡度小于间距 则会出现达不到最大值效果
+			i=i>=290?0:i;
+			
+			if(i==seg_end)
+			{
+				break;
+			}				
+			
+			///////////////////////////////////////////////////////////////////////////////
+			if(i!=0&&i!=289)
+			{
+				if(allcolors[i-1][0]==allcolors[i+1][0])	//比较上一颗值与这一颗值判断当前是否需要滤波   && allcolors[i][0]!=seg_color[segi][0]
+				{
+					allcolors[i][0]=allcolors[i+1][0];
+				}   
+				else if(allcolors[i-1][0]>allcolors[i+1][0])
+				{
+					allcolors[i][0]=allcolors[i-1][0]-smooth_factor;
+				}
+				else if(allcolors[i-1][0]<allcolors[i+1][0])
+				{
+					allcolors[i][0]=allcolors[i-1][0]+smooth_factor;
+				}
+				if(abs(allcolors[i][0]-allcolors[i+1][0])<smooth_factor)
+				{
+					allcolors[i][0]=allcolors[i+1][0];
+				}
+					//没有用for因为这样会节约一点资源
+				if(allcolors[i-1][1]==allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[i+1][1];
+				}
+				else if(allcolors[i-1][1]>allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[i-1][1]-smooth_factor;
+				}
+				else if(allcolors[i-1][1]<allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[i-1][1]+smooth_factor;
+				}
+				if(abs(allcolors[i][1]-allcolors[i+1][1])<smooth_factor)
+				{
+					allcolors[i][1]=allcolors[i+1][1];
+				}
+				
+					
+				if(allcolors[i-1][2]==allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[i+1][2];
+				}
+				else if(allcolors[i-1][2]>allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[i-1][2]-smooth_factor;
+				}
+				else if(allcolors[i-1][2]<allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[i-1][2]+smooth_factor;
+				}
+				if(abs(allcolors[i][2]-allcolors[i+1][2])<smooth_factor)
+				{
+					allcolors[i][2]=allcolors[i+1][2];
+				}
+			}
+			else if(i==0)	//i=0;需做特殊处理
+			{
+				if(allcolors[289][0]==allcolors[i+1][0])	//比较上一颗值与这一颗值判断当前是否需要滤波   && allcolors[i][0]!=seg_color[segi][0]
+				{
+					allcolors[i][0]=allcolors[i+1][0];
+				}   
+				else if(allcolors[289][0]>allcolors[i+1][0])
+				{
+					allcolors[i][0]=allcolors[289][0]-smooth_factor;
+				}
+				else if(allcolors[289][0]<allcolors[i+1][0])
+				{
+					allcolors[i][0]=allcolors[289][0]+smooth_factor;
+				}
+				if(abs(allcolors[i][0]-allcolors[i+1][0])<smooth_factor)
+				{
+					allcolors[i][0]=allcolors[i+1][0];
+				}
+					//没有用for因为这样会节约一点资源
+				if(allcolors[289][1]==allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[i+1][1];
+				}
+				else if(allcolors[289][1]>allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[289][1]-smooth_factor;
+				}
+				else if(allcolors[289][1]<allcolors[i+1][1])
+				{
+					allcolors[i][1]=allcolors[289][1]+smooth_factor;
+				}
+				if(abs(allcolors[i][1]-allcolors[i+1][1])<smooth_factor)
+				{
+					allcolors[i][1]=allcolors[i+1][1];
+				}
+				
+					
+				if(allcolors[289][2]==allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[i+1][2];
+				}
+				else if(allcolors[289][2]>allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[289][2]-smooth_factor;
+				}
+				else if(allcolors[289][2]<allcolors[i+1][2])
+				{
+					allcolors[i][2]=allcolors[289][2]+smooth_factor;
+				}
+				if(abs(allcolors[i][2]-allcolors[i+1][2])<smooth_factor)
+				{
+					allcolors[i][2]=allcolors[i+1][2];
+				}
+			}
+			else if(i==289)
+			{
+				
+			}
+
+			///////////////////////////////////////////////////////////////////////////
+			
+			i++;	//不包含最后一个
+		}
+	}
 //	for(int i=0;i<350;i++)
 //	{
 //		if(smooth_flag==0||i==0)	//第一颗颜色无比较对象
