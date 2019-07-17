@@ -74,7 +74,7 @@ u8 led_start2normal=0;
 u8 SK6812Colors[350][3]={0};
 #define MAX_LI 80
 u32 led_lightnums=350;
-void SK6812_Run(void)
+void SK6812_Run(void)	//200hz
 {
 
 ////////	if(led_start2normal==0)
@@ -87,16 +87,71 @@ void SK6812_Run(void)
 ////////		SK6812_SetNormal();
 ////////	}
 	
-	SK6812_BIGBUFF_Set();
 	//led_lightnums++;
 	//if(led_lightnums>1000) led_lightnums=0;
-	PAGE1_UpdateColor(SK6812Colors,1);//OK
-	PAGE2_UpdateColor(SK6812Colors,2);//XX
-	PAGE3_UpdateColor(SK6812Colors,3);//OK
-	PAGE4_UpdateColor(SK6812Colors,4);	//OK右上
-	PAGE5_UpdateColor(SK6812Colors,5);
-	//PWM2_1_DMA_Enable();
 	
+	if(time_1ms_count%100==0)
+	{
+		//SK6812_BIGBUFF_Set();
+	
+		//PAGE1_UpdateColor(SK6812Colors,1);//OK
+		//PAGE2_UpdateColor(SK6812Colors,2);//XX
+		//PAGE3_UpdateColor(SK6812Colors,3);//OK
+		//PAGE4_UpdateColor(SK6812Colors,4);	//OK右上
+		//PAGE5_UpdateColor(SK6812Colors,5);
+		
+		//PWM3_1_DMA_Enable();
+		//PWM3_2_DMA_Enable();
+		//PWM3_3_DMA_Enable();
+		//PWM2_2_DMA_Enable();
+		//PWM2_3_DMA_Enable();
+	}
+	
+	if((time_1ms_count-15)%100==0)
+	{
+		PAGE1_UpdateColor(SK6812Colors,1);//OK
+		PWM3_1_DMA_Enable();
+	}
+	else if((time_1ms_count-30)%100==0)
+	{
+		//PAGE2_UpdateColor(SK6812Colors,2);//XX
+		static u16 segnode[5]={72,72*2,72*3,287};
+		static u8 segcolor[5][3]=\
+		{\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+			{0,0,0},\
+			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
+			{0,0,0},\
+		};
+		SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor,5,0,10);
+		PAGE2_UpdateColor(SK6812Colors,287);
+		PWM3_2_DMA_Enable();
+		
+		for(int i=0;i<5;i++)
+		{
+			segnode[i]++;
+			if(segnode[i]>287)
+			{
+				segnode[i]=0;
+			}
+		}
+	}
+	else if((time_1ms_count-45)%100==0)
+	{
+		PAGE3_UpdateColor(SK6812Colors,3);//OK
+		PWM3_3_DMA_Enable();
+	}
+	else if((time_1ms_count-60)%100==0)
+	{
+		PAGE4_UpdateColor(SK6812Colors,4);	//
+		PWM2_2_DMA_Enable();
+	}
+	else if((time_1ms_count-75)%100==0)
+	{
+		PAGE5_UpdateColor(SK6812Colors,5);
+		PWM2_3_DMA_Enable();
+	}
+
 }
 
 u8 rgbstate=0;
@@ -359,30 +414,7 @@ void SK6812_SetError(void)
 	
 }
 
-#define PAGE1_ARMORSTART 93
-#define PAGE1_ARMOREND 207
-#define PAGE1_ALLEND 284
-#define PAGE2_ARMORSTART 94
-#define PAGE2_ARMOREND 211
-#define PAGE2_ALLEND 287
-#define PAGE3_ARMORSTART 94
-#define PAGE3_ARMOREND 205
-#define PAGE3_ALLEND 284
-#define PAGE4_ARMORSTART 94
-#define PAGE4_ARMOREND 206
-#define PAGE4_ALLEND 284
-#define PAGE5_ARMORSTART 91
-#define PAGE5_ARMOREND 208
-#define PAGE5_ALLEND 286
 
-#define CYAN 0
-#define ORANGE 1
-#define BIGBUFF_ORANGE_R 0x7F
-#define BIGBUFF_ORANGE_G 0x20
-#define BIGBUFF_ORANGE_B 0x00
-#define BIGBUFF_CYAN_R 0x00
-#define BIGBUFF_CYAN_G 0x60
-#define BIGBUFF_CYAN_B 0x43
 u8 BIGBUFF_COLOR=CYAN;
 void SK6812_BIGBUFF_Set(void)
 {
@@ -470,4 +502,84 @@ void SK6812_BIGBUFF_Set(void)
 //			
 //		}
 	
+}
+
+///@author YuXin
+///@brief draw color in different segment
+///@parm allcolors:所有颜色数组
+///@parm seg_node:分段节点坐标 向前包含关系 即当前节点为上一段颜色内
+///@parm seg_color:段颜色
+///@parm seg_nums:节点数
+///@parm smooth_flag:颜色平滑flag
+///@parm smooth_factor:平滑系数，前后差值最大值
+void SK6812_Draw_ColorSegmentation(u8 allcolors[][3],u16 seg_node[],u8 seg_color[][3],u16 seg_nums,bool smooth_flag,u8 smooth_factor)
+{
+	int segi=0;
+	for(int i=0;i<350;i++)
+	{
+		if(smooth_flag==0||i==0)	//第一颗颜色无比较对象
+		{
+			allcolors[i][0]=seg_color[segi][0];
+			allcolors[i][1]=seg_color[segi][1];
+			allcolors[i][2]=seg_color[segi][2];
+		}
+		else
+		{
+			if(allcolors[i-1][0]==seg_color[segi][0])	//比较上一颗值与这一颗值判断当前是否需要滤波
+			{
+				//do nothing
+			}   
+			else if(allcolors[i-1][0]>seg_color[segi][0])
+			{
+				allcolors[i][0]=allcolors[i-1][0]-smooth_factor;
+			}
+			else if(allcolors[i-1][0]<seg_color[segi][0])
+			{
+				allcolors[i][0]=allcolors[i-1][0]+smooth_factor;
+			}
+			if(abs(allcolors[i][0]-seg_color[segi][0])<smooth_factor)
+			{
+				allcolors[i][0]=seg_color[segi][0];
+			}
+				//没有用for因为这样会节约一点资源
+			if(allcolors[i][1]==seg_color[segi][1])
+			{
+				
+			}
+			else if(allcolors[i-1][1]>seg_color[segi][1])
+			{
+				allcolors[i][1]=allcolors[i-1][1]-smooth_factor;
+			}
+			else if(allcolors[i-1][1]<seg_color[segi][1])
+			{
+				allcolors[i][1]=allcolors[i-1][1]+smooth_factor;
+			}
+			if(abs(allcolors[i][1]-seg_color[segi][1])<smooth_factor)
+			{
+				allcolors[i][1]=seg_color[segi][1];
+			}
+			
+				
+			if(allcolors[i][2]==seg_color[segi][2])
+			{
+				
+			}
+			else if(allcolors[i-1][2]>seg_color[segi][2])
+			{
+				allcolors[i][2]=allcolors[i-1][2]-smooth_factor;
+			}
+			else if(allcolors[i-1][2]<seg_color[segi][2])
+			{
+				allcolors[i][2]=allcolors[i-1][2]+smooth_factor;
+			}
+			if(abs(allcolors[i][2]-seg_color[segi][2])<smooth_factor)
+			{
+				allcolors[i][2]=seg_color[segi][2];
+			}
+			
+		}
+		
+		
+		if(seg_node[segi]==i) segi++;
+	}
 }

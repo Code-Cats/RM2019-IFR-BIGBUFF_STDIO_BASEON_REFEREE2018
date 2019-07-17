@@ -1,4 +1,4 @@
-                        IFR2019程序规范样例405程序说明文档
+                        # IFR2019-BIGBUFF-SK6812 YuXin
 一、工程名称：RM-2019_BIGGBUFF_IFR-YuXin
 
 二、文件夹：
@@ -25,3 +25,11 @@ TIM3 CH1  --	ID0  			TIM2 CH1  --	ID0
 TIM3 CH2  --	ID1  			TIM2 CH2  --	ID1  
 TIM3 CH3  --	ID2  			TIM2 CH3  --	ID2  
 TIM3 CH4  --	ID3  			TIM2 CH4  --	ID3  
+
+扇叶 灯珠坐标记录  
+   装甲框start 装甲框end 总end
+1：		93  207  284
+2：		94  211  287
+3：		94  205  284
+4：		94  206  284
+5：		91  208  286

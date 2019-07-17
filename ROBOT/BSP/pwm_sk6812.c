@@ -674,7 +674,7 @@ bool PAGE1_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发	//PWM2_1
 //	Pwm3_1_DMABuffer[2]=0x3;
 //	Pwm3_1_DMABuffer[3]=0x1;
 //	Pwm3_1_Dmasetcounter=4;
-	PWM3_1_DMA_Enable();
+//	PWM3_1_DMA_Enable();
 	return true;
 }
 
@@ -699,7 +699,7 @@ bool PAGE2_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_2
 //	Pwm3_2_DMABuffer[2]=0x3;
 //	Pwm3_2_DMABuffer[3]=0x4;
 //	Pwm3_2_Dmasetcounter=4;
-	PWM3_2_DMA_Enable();
+//	PWM3_2_DMA_Enable();
 	return true;
 }
 
@@ -724,7 +724,7 @@ bool PAGE3_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_3
 //	Pwm3_3_DMABuffer[2]=0x3;
 //	Pwm3_3_DMABuffer[3]=0x3;
 //	Pwm3_3_Dmasetcounter=4;
-	PWM3_3_DMA_Enable();
+//	PWM3_3_DMA_Enable();
 	return true;
 }
 
@@ -750,7 +750,7 @@ bool PAGE4_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_3
 //	Pwm2_2_DMABuffer[2]=0x3;
 //	Pwm2_2_DMABuffer[3]=0x2;
 //	Pwm2_2_Dmasetcounter=4;
-	PWM2_2_DMA_Enable();
+//	PWM2_2_DMA_Enable();
 	return true;
 }
 
@@ -775,10 +775,18 @@ bool PAGE5_UpdateColor(u8 colors[][3],u16 led_nums)	//GRB 高位先发  //PWM2_3
 //	Pwm2_3_DMABuffer[2]=0x3;
 //	Pwm2_3_DMABuffer[3]=0x5;
 //	Pwm2_3_Dmasetcounter=4;
-	PWM2_3_DMA_Enable();
+//	PWM2_3_DMA_Enable();
 	return true;
 }
 
+void PAGE_ALL_DMA_Enable(void)	//使能DMA 启动一次更新
+{
+	PWM3_1_DMA_Enable();
+	PWM3_2_DMA_Enable();
+	PWM3_3_DMA_Enable();
+	PWM2_2_DMA_Enable();
+	PWM2_3_DMA_Enable();
+}
 //////void SK6812_TIM5_3_DMA_Init(void)
 //////{
 //////	NVIC_InitTypeDef nvic;

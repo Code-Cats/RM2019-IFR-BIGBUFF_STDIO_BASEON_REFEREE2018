@@ -30,7 +30,7 @@ void Control_Task(void)	//2ms
 	
 	LED_Blink_Set(2,6);
 	
-	if(time_1ms_count%100==0&&time_1ms_count>2000)
+	if(time_1ms_count%5==0&&time_1ms_count>1000)
 	{
 		SK6812_Run();	//全彩RGB运行函数
 	}
