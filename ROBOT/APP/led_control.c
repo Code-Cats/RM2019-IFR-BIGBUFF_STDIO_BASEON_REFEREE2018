@@ -115,15 +115,15 @@ void SK6812_Run(void)	//200hz
 	else if((time_1ms_count-30)%100==0)
 	{
 		//PAGE2_UpdateColor(SK6812Colors,2);//XX
-		static u16 segnode[5]={72,72*2,72*3,287};
-		static u8 segcolor[5][3]=\
+		static u16 segnode[4]={72,72*2,72*3,287};
+		static u8 segcolor[4][3]=\
 		{\
 			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
 			{0,0,0},\
 			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
 			{0,0,0},\
 		};
-		SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor,5,0,10);
+		SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor,4,0,10);
 		PAGE2_UpdateColor(SK6812Colors,287);
 		PWM3_2_DMA_Enable();
 		
@@ -513,73 +513,105 @@ void SK6812_BIGBUFF_Set(void)
 ///@parm smooth_flag:颜色平滑flag
 ///@parm smooth_factor:平滑系数，前后差值最大值
 void SK6812_Draw_ColorSegmentation(u8 allcolors[][3],u16 seg_node[],u8 seg_color[][3],u16 seg_nums,bool smooth_flag,u8 smooth_factor)
-{
+{//平滑功能必须全部绘制出来后再修改
 	int segi=0;
-	for(int i=0;i<350;i++)
+	
+	for(segi=0;segi<seg_nums;segi++)	//直接赋值
 	{
-		if(smooth_flag==0||i==0)	//第一颗颜色无比较对象
+		int i=0;
+		if(segi<seg_nums-1)
 		{
-			allcolors[i][0]=seg_color[segi][0];
-			allcolors[i][1]=seg_color[segi][1];
-			allcolors[i][2]=seg_color[segi][2];
+			i=seg_node[segi];
+			while(i!=seg_node[segi+1])	//向前包含关系 即当前节点为上一段颜色内
+			{
+				i++;
+				i=i>=290?0:i;
+				allcolors[i][0]=seg_color[segi][0];
+				allcolors[i][1]=seg_color[segi][1];
+				allcolors[i][2]=seg_color[segi][2];
+			}
 		}
 		else
 		{
-			if(allcolors[i-1][0]==seg_color[segi][0])	//比较上一颗值与这一颗值判断当前是否需要滤波
+			i=seg_node[segi];
+			while(i!=seg_node[0])	//向前包含关系 即当前节点为上一段颜色内
 			{
-				//do nothing
-			}   
-			else if(allcolors[i-1][0]>seg_color[segi][0])
-			{
-				allcolors[i][0]=allcolors[i-1][0]-smooth_factor;
-			}
-			else if(allcolors[i-1][0]<seg_color[segi][0])
-			{
-				allcolors[i][0]=allcolors[i-1][0]+smooth_factor;
-			}
-			if(abs(allcolors[i][0]-seg_color[segi][0])<smooth_factor)
-			{
+				i++;
+				i=i>=290?0:i;
 				allcolors[i][0]=seg_color[segi][0];
-			}
-				//没有用for因为这样会节约一点资源
-			if(allcolors[i][1]==seg_color[segi][1])
-			{
-				
-			}
-			else if(allcolors[i-1][1]>seg_color[segi][1])
-			{
-				allcolors[i][1]=allcolors[i-1][1]-smooth_factor;
-			}
-			else if(allcolors[i-1][1]<seg_color[segi][1])
-			{
-				allcolors[i][1]=allcolors[i-1][1]+smooth_factor;
-			}
-			if(abs(allcolors[i][1]-seg_color[segi][1])<smooth_factor)
-			{
 				allcolors[i][1]=seg_color[segi][1];
-			}
-			
-				
-			if(allcolors[i][2]==seg_color[segi][2])
-			{
-				
-			}
-			else if(allcolors[i-1][2]>seg_color[segi][2])
-			{
-				allcolors[i][2]=allcolors[i-1][2]-smooth_factor;
-			}
-			else if(allcolors[i-1][2]<seg_color[segi][2])
-			{
-				allcolors[i][2]=allcolors[i-1][2]+smooth_factor;
-			}
-			if(abs(allcolors[i][2]-seg_color[segi][2])<smooth_factor)
-			{
 				allcolors[i][2]=seg_color[segi][2];
 			}
-			
 		}
 		
-		
-		if(seg_node[segi]==i) segi++;
 	}
+	
+	
+//	for(int i=0;i<350;i++)
+//	{
+//		if(smooth_flag==0||i==0)	//第一颗颜色无比较对象
+//		{
+//			allcolors[i][0]=seg_color[segi][0];
+//			allcolors[i][1]=seg_color[segi][1];
+//			allcolors[i][2]=seg_color[segi][2];
+//		}
+//		else
+//		{
+//			if(allcolors[i-1][0]==seg_color[segi][0])	//比较上一颗值与这一颗值判断当前是否需要滤波
+//			{
+//				//do nothing
+//			}   
+//			else if(allcolors[i-1][0]>seg_color[segi][0])
+//			{
+//				allcolors[i][0]=allcolors[i-1][0]-smooth_factor;
+//			}
+//			else if(allcolors[i-1][0]<seg_color[segi][0])
+//			{
+//				allcolors[i][0]=allcolors[i-1][0]+smooth_factor;
+//			}
+//			if(abs(allcolors[i][0]-seg_color[segi][0])<smooth_factor)
+//			{
+//				allcolors[i][0]=seg_color[segi][0];
+//			}
+//				//没有用for因为这样会节约一点资源
+//			if(allcolors[i][1]==seg_color[segi][1])
+//			{
+//				
+//			}
+//			else if(allcolors[i-1][1]>seg_color[segi][1])
+//			{
+//				allcolors[i][1]=allcolors[i-1][1]-smooth_factor;
+//			}
+//			else if(allcolors[i-1][1]<seg_color[segi][1])
+//			{
+//				allcolors[i][1]=allcolors[i-1][1]+smooth_factor;
+//			}
+//			if(abs(allcolors[i][1]-seg_color[segi][1])<smooth_factor)
+//			{
+//				allcolors[i][1]=seg_color[segi][1];
+//			}
+//			
+//				
+//			if(allcolors[i][2]==seg_color[segi][2])
+//			{
+//				
+//			}
+//			else if(allcolors[i-1][2]>seg_color[segi][2])
+//			{
+//				allcolors[i][2]=allcolors[i-1][2]-smooth_factor;
+//			}
+//			else if(allcolors[i-1][2]<seg_color[segi][2])
+//			{
+//				allcolors[i][2]=allcolors[i-1][2]+smooth_factor;
+//			}
+//			if(abs(allcolors[i][2]-seg_color[segi][2])<smooth_factor)
+//			{
+//				allcolors[i][2]=seg_color[segi][2];
+//			}
+//			
+//		}
+//		
+//		
+//		if(seg_node[segi]==i) segi++;
+//	}
 }
