@@ -52,5 +52,7 @@ void SK6812_SetStart(void);	//调用周期100ms
 void SK6812_SetNormal(void);
 void SK6812_SetError(void);
 
+void SK6812_BIGBUFF_Set(void);
+
 void SK6812_Draw_ColorSegmentation(u8 allcolors[][3],u16 seg_node[],u8 seg_color[][3],u16 seg_nums,bool smooth_flag,u8 smooth_factor);
 #endif

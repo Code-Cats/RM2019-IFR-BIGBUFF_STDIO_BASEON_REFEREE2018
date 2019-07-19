@@ -3,9 +3,9 @@
 
 #include "gpio.h"
 
-void SK6812_BIGBUFF_Set(void);
-
 extern u32 time_1ms_count;
+
+u8 BIGBUFF_COLOR=CYAN;
 
 //#define BLINK_CYCLE 150
 //#define BLINK_INTERVAL 2500
@@ -69,7 +69,18 @@ void LED_Blink_Set(u8 frequency_green,u8 frequency_red)	//2s内闪烁次数,最高9
 	Frequency_Red=frequency_red>10?10:frequency_red;
 }
 
-u8 led_start2normal=0;
+extern u8 bigbuff_armorstate[5];	//0未激活  1待激活 2已激活
+ u16 segnode1[4]={0,PAGE1_ARMORSTART,PAGE1_ARMOREND,PAGE1_ALLEND};
+ u16 segnode2[4]={0,PAGE2_ARMORSTART,PAGE2_ARMOREND,PAGE2_ALLEND};
+ u16 segnode3[4]={0,PAGE3_ARMORSTART,PAGE3_ARMOREND,PAGE3_ALLEND};
+ u16 segnode4[4]={0,PAGE4_ARMORSTART,PAGE4_ARMOREND,PAGE4_ALLEND};
+ u16 segnode5[4]={0,PAGE5_ARMORSTART,PAGE5_ARMOREND,PAGE5_ALLEND};
+
+ 
+ 
+ 
+u8 bigbuff_waitflag=1;
+u32 bigbufftimeout=0;
 
 u8 SK6812Colors[350][3]={0};
 #define MAX_LI 80
@@ -87,145 +98,353 @@ void SK6812_Run(void)	//200hz
 ////////		SK6812_SetNormal();
 ////////	}
 	
-	//led_lightnums++;
-	//if(led_lightnums>1000) led_lightnums=0;
-	static u16 light_state=1;
-	if(time_1ms_count%100==0)
+	static u8 key_last=0;
+	if(KEY_PB0==1&&key_last==0)
 	{
-		light_state<<=1;
-		if(light_state==(0x0001<<10))
-		{
-			light_state=1;
-		}
-		//SK6812_BIGBUFF_Set();
+		bigbuff_waitflag=!bigbuff_waitflag;
+		bigbufftimeout=0;
+	}
+	key_last=KEY_PB0;
+	bigbufftimeout++;
+	if(bigbufftimeout>=120000)
+	{
+		bigbuff_waitflag=1;
+	}
 	
-		//PAGE1_UpdateColor(SK6812Colors,1);//OK
-		//PAGE2_UpdateColor(SK6812Colors,2);//XX
-		//PAGE3_UpdateColor(SK6812Colors,3);//OK
-		//PAGE4_UpdateColor(SK6812Colors,4);	//OK右上
-		//PAGE5_UpdateColor(SK6812Colors,5);
+	if(bigbuff_waitflag==0)	//正常状态
+	{
+		if(time_1ms_count%100==0)
+		{
+			static u8 bigbuff_r=BIGBUFF_CYAN_R;
+			static u8 bigbuff_g=BIGBUFF_CYAN_G;
+			static u8 bigbuff_b=BIGBUFF_CYAN_B;
+			
+			if(BIGBUFF_COLOR==CYAN)
+			{
+				 bigbuff_r=BIGBUFF_CYAN_R;
+				 bigbuff_g=BIGBUFF_CYAN_G;
+				 bigbuff_b=BIGBUFF_CYAN_B;
+			}
+			else
+			{
+				 bigbuff_r=BIGBUFF_ORANGE_R;
+				 bigbuff_g=BIGBUFF_ORANGE_G;
+				 bigbuff_b=BIGBUFF_ORANGE_B;
+			}
+			
+			 u8 segcolor_light[4][3]=\
+			{\
+				{bigbuff_g,bigbuff_r,bigbuff_b},\
+				{bigbuff_g,bigbuff_r,bigbuff_b},\
+				{bigbuff_g,bigbuff_r,bigbuff_b},\
+				{bigbuff_g,bigbuff_r,bigbuff_b},\
+			};
+			 u8 segcolor_wait[4][3]=\
+			{\
+				{0,0,0},\
+				{bigbuff_g,bigbuff_r,bigbuff_b},\
+				{0,0,0},\
+				{0,0,0},\
+			};
+			 u8 segcolor_no[4][3]=\
+			{\
+				{0,0,0},\
+				{0,0,0},\
+				{0,0,0},\
+				{0,0,0},\
+			};
+
+			
+			//SK6812_BIGBUFF_Set();
 		
-		//PWM3_1_DMA_Enable();
-		//PWM3_2_DMA_Enable();
-		//PWM3_3_DMA_Enable();
-		//PWM2_2_DMA_Enable();
-		//PWM2_3_DMA_Enable();
+			if(bigbuff_armorstate[3]==0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode1,segcolor_no,4,false,1);
+			}
+			else if(bigbuff_armorstate[3]==1)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode1,segcolor_wait,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode1,segcolor_light,4,false,1);
+			}
+			PAGE1_UpdateColor(SK6812Colors,290);//OK
+			
+			if(bigbuff_armorstate[4]==0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode2,segcolor_no,4,false,1);
+			}
+			else if(bigbuff_armorstate[4]==1)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode2,segcolor_wait,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode2,segcolor_light,4,false,1);
+			}
+			PAGE2_UpdateColor(SK6812Colors,290);//XX
+			
+			if(bigbuff_armorstate[0]==0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode3,segcolor_no,4,false,1);
+			}
+			else if(bigbuff_armorstate[0]==1)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode3,segcolor_wait,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode3,segcolor_light,4,false,1);
+			}
+			for(int i=285;i<340;i++)
+			{
+				SK6812Colors[i][0]=bigbuff_g;
+				SK6812Colors[i][1]=bigbuff_r;
+				SK6812Colors[i][2]=bigbuff_b;
+			}
+			PAGE3_UpdateColor(SK6812Colors,350);//OK
+			
+			
+			if(bigbuff_armorstate[1]==0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode4,segcolor_no,4,false,1);
+			}
+			else if(bigbuff_armorstate[1]==1)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode4,segcolor_wait,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode4,segcolor_light,4,false,1);
+			}
+			PAGE4_UpdateColor(SK6812Colors,290);	//OK右上
+			
+			if(bigbuff_armorstate[2]==0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode5,segcolor_no,4,false,1);
+			}
+			else if(bigbuff_armorstate[2]==1)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode5,segcolor_wait,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode5,segcolor_light,4,false,1);
+			}
+			PAGE5_UpdateColor(SK6812Colors,290);
+			
+			PWM3_1_DMA_Enable();
+			PWM3_2_DMA_Enable();
+			PWM3_3_DMA_Enable();
+			PWM2_2_DMA_Enable();
+			PWM2_3_DMA_Enable();
+		}
 	}
-	
-	static u8 segcolor_r[4][3]=\
-		{\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-			{0,0,0},\
-			{0,0,0},\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-		};
-	static u8 segcolor_l[4][3]=\
-		{\
-			{0,0,0},\
-			{0,0,0},\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-		};
-	static u8 segcolor_no[4][3]=\
-		{\
-			{0,0,0},\
-			{0,0,0},\
-			{0,0,0},\
-			{BIGBUFF_CYAN_G,BIGBUFF_CYAN_R,BIGBUFF_CYAN_B},\
-		};
-	
-	if((time_1ms_count-15)%100==0)
+	else	//待机状态
 	{
-		static u16 segnode[4]={0,PAGE1_ARMORSTART,PAGE1_ARMOREND,PAGE1_ALLEND};
-		if((light_state&0x0001<<0)!=0)
+		static u16 light_state=1;
+		if(time_1ms_count%100==0)
 		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
-		}
-		else if((light_state&0x0001<<1)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
-		}
-		else
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
-		}
-		PAGE1_UpdateColor(SK6812Colors,290);//OK
-		PWM3_1_DMA_Enable();
-	}
-	else if((time_1ms_count-30)%100==0)
-	{
-		//PAGE2_UpdateColor(SK6812Colors,2);//XX
-		static u16 segnode[4]={0,PAGE2_ARMORSTART,PAGE2_ARMOREND,PAGE2_ALLEND};
-		if((light_state&0x0001<<2)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
-		}
-		else if((light_state&0x0001<<3)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
-		}
-		else
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
-		}
+			light_state<<=1;
+			if(light_state==(0x0001<<10))
+			{
+				light_state=1;
+			}
+			//SK6812_BIGBUFF_Set();
 		
-		PAGE2_UpdateColor(SK6812Colors,287);
-		PWM3_2_DMA_Enable();
+			//PAGE1_UpdateColor(SK6812Colors,1);//OK
+			//PAGE2_UpdateColor(SK6812Colors,2);//XX
+			//PAGE3_UpdateColor(SK6812Colors,3);//OK
+			//PAGE4_UpdateColor(SK6812Colors,4);	//OK右上
+			//PAGE5_UpdateColor(SK6812Colors,5);
+			
+			//PWM3_1_DMA_Enable();
+			//PWM3_2_DMA_Enable();
+			//PWM3_3_DMA_Enable();
+			//PWM2_2_DMA_Enable();
+			//PWM2_3_DMA_Enable();
+		}
+		////////////////////////////////////
+		
+		static u8 wait_r=255;
+		static u8 wait_g=0;
+		static u8 wait_b=100;	//数组顺序为grb
+		
+		static u8 rgbstate=1;
+		static u8 krg,kgb,kbr=0;
+		
+		if(time_1ms_count%50==0)
+		switch(rgbstate)
+		{
+			case 0:
+			{
+				krg++;
+				if(krg>=MAX_LI)
+				{
+					rgbstate=1;
+					krg=MAX_LI;
+					kgb=0;
+					kbr=0;
+				}
+				wait_r=(u8)(MAX_LI-krg);
+				wait_g=(u8)(krg);
+				wait_b=0;
+				break;
+			}
+			case 1:
+			{
+				kgb++;
+				if(kgb>=MAX_LI)
+				{
+					rgbstate=2;
+					krg=0;
+					kgb=MAX_LI;
+					kbr=0;
+				}
+				wait_r=0;
+				wait_g=(u8)(MAX_LI-kgb);
+				wait_b=(u8)(kgb);
+				break;
+			}
+			case 2:
+			{
+				kbr++;
+				if(kbr>=MAX_LI)
+				{
+					rgbstate=0;
+					krg=0;
+					kgb=0;
+					kbr=MAX_LI;
+				}
+				wait_r=(u8)(kbr);
+				wait_g=0;
+				wait_b=(u8)(MAX_LI-kbr);
+				break;
+			}
+		}
+		////////////////////////////////////////////
+		
+		
+		u8 segcolor_r[4][3]=\
+			{\
+				{wait_g,wait_r,wait_b},\
+				{0,0,0},\
+				{0,0,0},\
+				{wait_g,wait_r,wait_b},\
+			};
+		u8 segcolor_l[4][3]=\
+			{\
+				{0,0,0},\
+				{0,0,0},\
+				{wait_g,wait_r,wait_b},\
+				{wait_g,wait_r,wait_b},\
+			};
+		u8 segcolor_no[4][3]=\
+			{\
+				{0,0,0},\
+				{0,0,0},\
+				{0,0,0},\
+				{wait_g,wait_r,wait_b},\
+			};
+		
+		if((time_1ms_count-15)%100==0)
+		{
+			static u16 segnode[4]={0,PAGE1_ARMORSTART,PAGE1_ARMOREND,PAGE1_ALLEND};
+			if((light_state&0x0001<<0)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+			}
+			else if((light_state&0x0001<<1)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+			}
+			PAGE1_UpdateColor(SK6812Colors,290);//OK
+			PWM3_1_DMA_Enable();
+		}
+		else if((time_1ms_count-30)%100==0)
+		{
+			//PAGE2_UpdateColor(SK6812Colors,2);//XX
+			static u16 segnode[4]={0,PAGE2_ARMORSTART,PAGE2_ARMOREND,PAGE2_ALLEND};
+			if((light_state&0x0001<<2)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+			}
+			else if((light_state&0x0001<<3)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+			}
+			
+			PAGE2_UpdateColor(SK6812Colors,287);
+			PWM3_2_DMA_Enable();
+		}
+		else if((time_1ms_count-45)%100==0)
+		{
+			static u16 segnode[4]={0,PAGE3_ARMORSTART,PAGE3_ARMOREND,PAGE3_ALLEND};
+			if((light_state&0x0001<<4)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+			}
+			else if((light_state&0x0001<<5)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+			}
+			PAGE3_UpdateColor(SK6812Colors,350);//OK
+			PWM3_3_DMA_Enable();
+		}
+		else if((time_1ms_count-60)%100==0)
+		{
+			static u16 segnode[4]={0,PAGE4_ARMORSTART,PAGE4_ARMOREND,PAGE4_ALLEND};
+			if((light_state&0x0001<<6)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+			}
+			else if((light_state&0x0001<<7)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+			}
+			PAGE4_UpdateColor(SK6812Colors,290);	//
+			PWM2_2_DMA_Enable();
+		}
+		else if((time_1ms_count-75)%100==0)
+		{
+			static u16 segnode[4]={0,PAGE5_ARMORSTART,PAGE5_ARMOREND,PAGE5_ALLEND};
+			if((light_state&0x0001<<8)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
+			}
+			else if((light_state&0x0001<<9)!=0)
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
+			}
+			else
+			{
+				SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
+			}
+			PAGE5_UpdateColor(SK6812Colors,290);
+			PWM2_3_DMA_Enable();
+		}
 	}
-	else if((time_1ms_count-45)%100==0)
-	{
-		static u16 segnode[4]={0,PAGE3_ARMORSTART,PAGE3_ARMOREND,PAGE3_ALLEND};
-		if((light_state&0x0001<<4)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
-		}
-		else if((light_state&0x0001<<5)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
-		}
-		else
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
-		}
-		PAGE3_UpdateColor(SK6812Colors,350);//OK
-		PWM3_3_DMA_Enable();
-	}
-	else if((time_1ms_count-60)%100==0)
-	{
-		static u16 segnode[4]={0,PAGE4_ARMORSTART,PAGE4_ARMOREND,PAGE4_ALLEND};
-		if((light_state&0x0001<<6)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
-		}
-		else if((light_state&0x0001<<7)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
-		}
-		else
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
-		}
-		PAGE4_UpdateColor(SK6812Colors,290);	//
-		PWM2_2_DMA_Enable();
-	}
-	else if((time_1ms_count-75)%100==0)
-	{
-		static u16 segnode[4]={0,PAGE5_ARMORSTART,PAGE5_ARMOREND,PAGE5_ALLEND};
-		if((light_state&0x0001<<8)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_l,4,false,1);
-		}
-		else if((light_state&0x0001<<9)!=0)
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_r,4,false,1);
-		}
-		else
-		{
-			SK6812_Draw_ColorSegmentation(SK6812Colors,segnode,segcolor_no,4,false,1);
-		}
-		PAGE5_UpdateColor(SK6812Colors,290);
-		PWM2_3_DMA_Enable();
-	}
+	
+	
+	
+	
 
 }
 
@@ -490,7 +709,7 @@ void SK6812_SetError(void)
 }
 
 
-u8 BIGBUFF_COLOR=CYAN;
+
 void SK6812_BIGBUFF_Set(void)
 {
 	

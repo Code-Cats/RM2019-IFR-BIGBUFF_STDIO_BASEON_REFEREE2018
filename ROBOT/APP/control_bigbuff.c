@@ -1,226 +1,185 @@
 #include "control_bigbuff.h"
 #include "time.h"
 
-u8 viceboard_num = 0;
 
-const u8 viceboard_seqience[120][5]={
-							{5, 4, 3, 2, 1},
-							{5, 4, 3, 1, 2},
-							{5, 4, 1, 2, 3},
-							{5, 4, 2, 3, 1},
-							{5, 4, 1, 3, 2},
-							{5, 4, 2, 1, 3},							
-							{5, 1, 3, 2, 4},
-							{5, 2, 3, 4, 1},
-							{5, 3, 4, 2, 1},							
-							{5, 3, 4, 1, 2},
-							{5, 1, 3, 4, 2},
-							{5, 2, 3, 1, 4},							
-							{5, 1, 4, 2, 3},
-							{5, 2, 1, 4, 3},
-							{5, 3, 1, 2, 4},						
-							{5, 2, 4, 3, 1},
-							{5, 3, 2, 4, 1},
-							{5, 1, 2, 3, 4},							
-							{5, 1, 4, 3, 2},
-							{5, 3, 1, 4, 2},
-							{5, 2, 1, 3, 4},							
-							{5, 2, 4, 1, 3},
-							{5, 1, 2, 4, 3},
-							{5, 3, 2, 1, 4},
-							
-							{4, 5, 3, 2, 1},
-							{4, 5, 3, 1, 2},
-							{4, 5, 1, 2, 3},
-							{4, 5, 2, 3, 1},
-							{4, 5, 1, 3, 2},
-							{4, 5, 2, 1, 3},							
-							{4, 3, 5, 2, 1},
-							{4, 2, 3, 5, 1},
-							{4, 1, 3, 2, 5},						
-							{4, 3, 5, 1, 2},
-							{4, 1, 3, 5, 2},
-							{4, 2, 3, 1, 5},							
-							{4, 1, 5, 2, 3},
-							{4, 2, 1, 5, 3},
-							{4, 3, 1, 2, 5},							
-							{4, 2, 5, 3, 1},
-							{4, 3, 2, 5, 1},
-							{4, 1, 2, 3, 5},							
-							{4, 1, 5, 3, 2},
-							{4, 3, 1, 5, 2},
-							{4, 2, 1, 3, 5},							
-							{4, 2, 5, 1, 3},
-							{4, 1, 2, 5, 3},
-							{4, 3, 2, 1, 5},
-							
-							{3, 5, 4, 2, 1},
-							{3, 5, 4, 1, 2},
-							{3, 5, 1, 2, 4},
-							{3, 5, 2, 4, 1},
-							{3, 5, 1, 4, 2},
-							{3, 5, 2, 1, 4},							
-							{3, 4, 5, 2, 1},
-							{3, 2, 4, 5, 1},
-							{3, 1, 4, 2, 5},						
-							{3, 4, 5, 1, 2},
-							{3, 1, 4, 5, 2},
-							{3, 2, 4, 1, 5},							
-							{3, 1, 5, 2, 4},
-							{3, 2, 1, 5, 4},
-							{3, 4, 1, 2, 5},							
-							{3, 2, 5, 4, 1},
-							{3, 4, 2, 5, 1},
-							{3, 1, 2, 4, 5},							
-							{3, 1, 5, 4, 2},
-							{3, 4, 1, 5, 2},
-							{3, 2, 1, 4, 5},							
-							{3, 2, 5, 1, 4},
-							{3, 1, 2, 5, 4},
-							{3, 4, 2, 1, 5},
-							
-							{2, 5, 4, 3, 1},
-							{2, 5, 4, 1, 3},
-							{2, 5, 1, 3, 4},
-							{2, 5, 3, 4, 1},
-							{2, 5, 1, 4, 3},
-							{2, 5, 3, 1, 4},							
-							{2, 4, 5, 3, 1},
-							{2, 3, 4, 5, 1},
-							{2, 1, 4, 3, 5},						
-							{2, 4, 5, 1, 3},
-							{2, 1, 4, 5, 3},
-							{2, 3, 4, 1, 5},							
-							{2, 1, 5, 3, 4},
-							{2, 3, 1, 5, 4},
-							{2, 4, 1, 3, 5},							
-							{2, 3, 5, 4, 1},
-							{2, 4, 3, 5, 1},
-							{2, 1, 3, 4, 5},							
-							{2, 1, 5, 4, 3},
-							{2, 4, 1, 5, 3},
-							{2, 3, 1, 4, 5},							
-							{2, 3, 5, 1, 4},
-							{2, 1, 3, 5, 4},
-							{2, 4, 3, 1, 5},
-							
-							{1, 5, 4, 3, 2},
-							{1, 5, 4, 2, 3},
-							{1, 5, 2, 3, 4},
-							{1, 5, 3, 4, 2},
-							{1, 5, 2, 4, 3},
-							{1, 5, 3, 2, 4},							
-							{1, 4, 5, 3, 2},
-							{1, 3, 4, 5, 2},
-							{1, 2, 4, 3, 5},						
-							{1, 4, 5, 2, 3},
-							{1, 2, 4, 5, 3},
-							{1, 3, 4, 2, 5},							
-							{1, 2, 5, 3, 4},
-							{1, 3, 2, 5, 4},
-							{1, 4, 2, 3, 5},							
-							{1, 3, 5, 4, 2},
-							{1, 4, 3, 5, 2},
-							{1, 2, 3, 4, 5},							
-							{1, 2, 5, 4, 3},
-							{1, 4, 2, 5, 3},
-							{1, 3, 2, 4, 5},							
-							{1, 3, 5, 2, 4},
-							{1, 2, 3, 5, 4},
-							{1, 4, 3, 2, 5}
-};
+extern u32 time_1ms_count;
 
-u8 alreadly_count = 0;
-u8 plate_sequence = 0;
-u8 ready_flag = 1;
-u8 last_number = 0;
-void Work_Normal(void)
+u8 bigbuff_lightstate=0;
+u8 bigbuff_armorstate[5]={1,0,0,0,0};	//0未激活  1待激活 2已激活
+u8 bigbuff_activate_flag=0;
+u32 bigbuff_timeout=0;
+
+u8 changecolor_flag=0xe0;;//0xe0
+extern u8 BIGBUFF_COLOR;
+
+void Bigbuff_Failed_Deal(void)	//大风车击打失败处理函数
 {
-	extern u32 time_1ms_count;
-	static u8 select_viceboard_flag = 1;
-	static u16 all_viceboard_shoot = 0;
-	static u16 wait_shoot_time = 0;
-		
-	if(ready_flag)
+	static int last_armorid=0;
+	srand(time_1ms_count);
+	for(int i=0;i<5;i++)
 	{
-		if(alreadly_count<5)
-		{
-			if(select_viceboard_flag)
-			{
-				plate_sequence = rand()%120;//time_1ms_count % 120;
-				while(last_number == viceboard_seqience[plate_sequence][0])
-				{
-					plate_sequence = rand()%120;
-				}
-				last_number = viceboard_seqience[plate_sequence][0];
-				select_viceboard_flag = 0;
+		bigbuff_armorstate[i]=0;
+	}
+	bigbuff_timeout=0;
+	int armor_id=rand()%5;
+	while(armor_id==last_armorid)
+	{
+		armor_id=rand()%5;
+	}
+	bigbuff_armorstate[armor_id]=1;
+}
 
-			}
-			else
-			{
-			
-				viceboard_num = viceboard_seqience[plate_sequence][alreadly_count];
-
-				switch(viceboard_num)
-				{
-					case 1:PLATE1_LED1_ON; break;
-					case 2:PLATE2_LED1_ON; break;
-					case 3:PLATE3_LED1_ON; break;
-					case 4:PLATE4_LED1_ON; break;
-					case 5:PLATE5_LED1_ON; break;
-					default: break;
-				}
-				wait_shoot_time = 0;
-				ready_flag = 0;
-			}
-		}
-		else
-		{
-			all_viceboard_shoot++;		
-			if(all_viceboard_shoot > 3500)
-			{
-				all_viceboard_shoot = 0;
-				
-				PLATE_LED_ALL_OFF;
-				select_viceboard_flag = 1;
-				alreadly_count = 0;
-				wait_shoot_time = 0;
-				
-				
-			}
-			else
-			{
-				if(all_viceboard_shoot%500==0)
-				{
-					PLATE_LED_ALL_TOGGLE;
-				}
-			}
-				
-		}
-		
+void Bigbuff_HitSucced_Deal(void)	//从待激活到已激活放到回调里处理
+{
+	bigbuff_timeout=0; 
+	srand(time_1ms_count);
+	int armor_id=rand()%5;
+	
+	if(bigbuff_armorstate[0]==2&&\
+	bigbuff_armorstate[1]==2&&\
+	bigbuff_armorstate[2]==2&&\
+	bigbuff_armorstate[3]==2&&\
+	bigbuff_armorstate[4]==2)
+	{
+		bigbuff_activate_flag=1;
 	}
 	else
 	{
-		if(wait_shoot_time <2500)
-			wait_shoot_time++;
-		else
+		while(bigbuff_armorstate[armor_id]!=0)
 		{
-			wait_shoot_time = 0;
-			ready_flag = 1;		
-			select_viceboard_flag = 1;
-			alreadly_count = 0;
+			armor_id=rand()%5;
+		}
+		bigbuff_armorstate[armor_id]=1;
+	}
+	
+}
 
-			PLATE_LED_ALL_OFF;
+//定时器 1000HZ
+void BigBuff_Control_Tack(void)
+{
+	bigbuff_timeout++;
+	
+	if(bigbuff_activate_flag==1)
+	{
+		static u8 succsedlightstate=0;
+		if(bigbuff_timeout>4000)	//超时处理
+		{
+			Bigbuff_Failed_Deal();
+			bigbuff_activate_flag=0;
+			changecolor_flag=0xe0;
+		}
 		
+		if(time_1ms_count%100==0)
+		{
+			succsedlightstate=!succsedlightstate;
+		}
+		
+		for(int i=0;i<5;i++)
+		{
+			bigbuff_armorstate[i]=2*succsedlightstate;
 		}
 	}
-			
-		
+	else
+	{
+		if(bigbuff_timeout>1500)	//超时处理
+		{
+			Bigbuff_Failed_Deal();
+		}
+	}
 }
 
 
-void BigBuff_Control_Tack(void)
+//打击回调
+void ArmorHit_Deal(AimorIDEnum id)
 {
+	bigbuff_timeout=0;
+	if(bigbuff_activate_flag==0)
+	{
+		switch(id)
+		{
+			case AIMORID_240:
+			{
+				if(bigbuff_armorstate[0]!=1)
+				{
+					Bigbuff_Failed_Deal();
+				}
+				else
+				{
+					bigbuff_armorstate[0]=2;
+					Bigbuff_HitSucced_Deal();
+				}
+				break;
+			}
+			case AIMORID_241:
+			{
+				if(bigbuff_armorstate[1]!=1)
+				{
+					Bigbuff_Failed_Deal();
+				}
+				else
+				{
+					bigbuff_armorstate[1]=2;
+					Bigbuff_HitSucced_Deal();
+				}
+				break;
+			}
+			case AIMORID_242:
+			{
+				if(bigbuff_armorstate[2]!=1)
+				{
+					Bigbuff_Failed_Deal();
+				}
+				else
+				{
+					bigbuff_armorstate[2]=2;
+					Bigbuff_HitSucced_Deal();
+				}
+				break;
+			}
+			case AIMORID_243:
+			{
+				if(bigbuff_armorstate[3]!=1)
+				{
+					Bigbuff_Failed_Deal();
+				}
+				else
+				{
+					bigbuff_armorstate[3]=2;
+					Bigbuff_HitSucced_Deal();
+				}
+				break;
+			}
+			case AIMORID_244:
+			{
+				if(bigbuff_armorstate[4]!=1)
+				{
+					Bigbuff_Failed_Deal();
+				}
+				else
+				{
+					bigbuff_armorstate[4]=2;
+					Bigbuff_HitSucced_Deal();
+				}
+				break;
+			}
+			default:
+			{
+				
+				break;
+			}
+		}
 
-	Work_Normal();
+	}
+	else	//已激活待切换颜色
+	{
+		changecolor_flag|=0x01<<id;//记录激活后敲打了哪些装甲板
+		if(changecolor_flag==0xf5)
+		{
+			BIGBUFF_COLOR=CYAN;
+		}
+		else if(changecolor_flag==0xea)
+		{
+			BIGBUFF_COLOR=ORANGE;
+		}
+	}
 }

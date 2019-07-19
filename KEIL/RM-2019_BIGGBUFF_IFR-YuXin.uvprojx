@@ -363,7 +363,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx</Define>
+              <Define>USE_STDPERIPH_DRIVER,__USE_C99_STDLIB,STM32F40_41xxx</Define>
               <Undefine></Undefine>
               <IncludePath>..\USER;..\STM32MCU;..\STM32MCU\FWLIB\inc;..\STM32MCU\CORE;..\ROBOT\ALGO;..\ROBOT\ANALYSIS;..\ROBOT\APP;..\ROBOT\BSP</IncludePath>
             </VariousControls>

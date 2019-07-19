@@ -14,6 +14,7 @@ int main(void)
 	BSP_Init();
 	delay_ms(500);
 	CAN_RefereeStart_SendMsg();
+	SK6812_BIGBUFF_Set();
 	while(1)
 	 {
 		 //PLATE_LED_ALL_ON;
@@ -26,7 +27,8 @@ int main(void)
 		 }
 	 }
 }
-
+extern u8 bigbuff_waitflag;
+extern u32 bigbufftimeout;
 /****************************************************
 name:ArmorHit_CallBack
 function:装甲板被击打时产生的回调
@@ -39,6 +41,9 @@ description:击打回调函数，其中处理击打数据
 ****************************************************/
 void ArmorHit_CallBack(AimorIDEnum id,AimorHitTypeEnum type)
 {
+	bigbuff_waitflag=0;
+	bigbufftimeout=0;
+	ArmorHit_Deal(id);
 ////	extern u8 viceboard_num;
 ////	extern u8 ready_flag;
 ////	extern u8 alreadly_count;
@@ -71,6 +76,6 @@ description:在里面处理定时任务，注意处理任务时间不能大于1ms，不能使用Delay，否侧
 void Timer_1ms_CallBack(void)
 {
 	//系统全局时间time_1ms_count 已做自加处理，无需再加
-	////BigBuff_Control_Tack();
+	BigBuff_Control_Tack();
 }
 

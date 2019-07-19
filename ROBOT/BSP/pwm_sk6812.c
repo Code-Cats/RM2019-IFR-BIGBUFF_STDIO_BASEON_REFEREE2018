@@ -2,7 +2,7 @@
 
 //共用参数
 #define SK6812BIT_HIGH 3
-#define SK6812BIT_LOW 1
+#define SK6812BIT_LOW 2
 const u8 SK6812BitDef[2] ={SK6812BIT_LOW,SK6812BIT_HIGH};
 #define SK6812_NUMS 350
 #define SK6812_SIZE 24*SK6812_NUMS+1	//最后一bit为reset电平	//还有另一种实现思路是使能DMA传输完成中断 并在该中断中将CCR寄存器置0
@@ -51,9 +51,9 @@ void PWM2_Init(void)
 	GPIO_PinAFConfig(GPIOB,GPIO_PinSource11,GPIO_AF_TIM2);//定时器2 通道4
 
 	/* TIM2 */
-	tim.TIM_Prescaler = 19-1;	//18OK
+	tim.TIM_Prescaler = 17-1;//19	//18OK
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
-	tim.TIM_Period = 1*5;   //4->1us	//0.5HIGH 0.75LOW 0码； 0.75HIGH 0.5LOW 1码
+	tim.TIM_Period = 6-1;   //4->1us	//0.5HIGH 0.75LOW 0码； 0.75HIGH 0.5LOW 1码
 	tim.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM2,&tim);	//初始化时间基数单位
 
@@ -362,9 +362,9 @@ void PWM3_Init(void)
 	GPIO_PinAFConfig(GPIOC,GPIO_PinSource9,GPIO_AF_TIM3);//定时器3 通道4
 
 	/* TIM3 */
-	tim.TIM_Prescaler = 19-1;	//18OK
+	tim.TIM_Prescaler = 17-1;	//18OK
 	tim.TIM_CounterMode = TIM_CounterMode_Up;
-	tim.TIM_Period = 1*5;   //4->1us	//0.5HIGH 0.75LOW 0码； 0.75HIGH 0.5LOW 1码
+	tim.TIM_Period = 6-1;   //4->1us	//0.5HIGH 0.75LOW 0码； 0.75HIGH 0.5LOW 1码
 	tim.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseInit(TIM3,&tim);	//初始化时间基数单位
 
